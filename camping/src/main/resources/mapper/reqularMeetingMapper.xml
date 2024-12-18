@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ict.camping.domain.reqularMeeting.mapper.ReqularMeetingMapper">
+
+  <!-- 정규모임 추가 -->
+  <insert id="insertMeeting" parameterType="ReqularMeetingVO">
+    INSERT INTO regular_meetings (name, description, leader_idx, created_at)
+    VALUES (#{name}, #{description}, #{leader_idx}, CURRENT_TIMESTAMP)
+  </insert>
+
+  <!-- 모든 정규모임 조회 -->
+  <select id="selectAllMeetings" resultType="ReqularMeetingVO">
+    SELECT meeting_idx, name, description, leader_idx, created_at
+    FROM regular_meetings
+    ORDER BY created_at DESC
+  </select>
+
+  <!-- 특정 정규모임 조회 -->
+  <select id="selectMeetingById" parameterType="int" resultType="ReqularMeetingVO">
+    SELECT meeting_idx, name, description, leader_idx, created_at
+    FROM regular_meetings
+    WHERE meeting_idx = #{meetingId}
+  </select>
+</mapper>

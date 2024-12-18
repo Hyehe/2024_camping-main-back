@@ -4,23 +4,55 @@
 
 <mapper namespace="com.ict.camping.domain.reqularMeeting.mapper.ReqularMeetingMapper">
 
-  <!-- 정규모임 추가 -->
-  <insert id="insertMeeting" parameterType="ReqularMeetingVO">
-    INSERT INTO regular_meetings (name, description, leader_idx, created_at)
-    VALUES (#{name}, #{description}, #{leader_idx}, CURRENT_TIMESTAMP)
+<!-- 정규 모임 목록 가져오기 -->
+  <select id="selectAllMeetings" resultMap="MeetingResultMap">
+    SELECT 
+      rm.meeting_idx,
+      rm.name,
+      rm.description,
+      rm.profile_image,
+      rm.region,
+      rm.subregion,
+      rm.personnel,
+      rm.created_at,
+      GROUP_CONCAT(h.name) AS hashtags, 
+      CASE WHEN f.user_idx IS NOT NULL THEN true ELSE false END AS favorites_idx
+    FROM regular_meetings rm
+    LEFT JOIN meeting_hashtags mh ON rm.meeting_idx = mh.meeting_idx
+    LEFT JOIN hashtags h ON mh.hashtag_idx = h.hashtag_idx
+    LEFT JOIN favorites f ON rm.meeting_idx = f.meeting_idx AND f.user_idx = #{user_idx}
+    GROUP BY rm.meeting_idx
+  </select>
+
+  <!-- 정규 모임 생성 -->
+  <insert id="createMeeting">
+    INSERT INTO regular_meetings (name, description, profile_image, region, subregion, personnel, leader_idx)
+    VALUES (#{name}, #{description}, #{profile_image}, #{region}, #{subregion}, #{personnel}, #{leader_idx})
   </insert>
 
+  <!-- 해시태그 연결 -->
+  <insert id="insertMeetingHashtags">
+    INSERT INTO meeting_hashtags (meeting_idx, hashtag_idx)
+    VALUES (#{meeting_idx}, #{hashtag_idx})
+  </insert>
+
+  <!-- 정규모임 추가 -->
+  <!-- <insert id="insertMeeting" parameterType="ReqularMeetingVO">
+    INSERT INTO regular_meetings (name, description, leader_idx, created_at)
+    VALUES (#{name}, #{description}, #{leader_idx}, CURRENT_TIMESTAMP)
+  </insert> -->
+
   <!-- 모든 정규모임 조회 -->
-  <select id="selectAllMeetings" resultType="ReqularMeetingVO">
+  <!-- <select id="selectAllMeetings" resultType="ReqularMeetingVO">
     SELECT meeting_idx, name, description, leader_idx, created_at
     FROM regular_meetings
     ORDER BY created_at DESC
-  </select>
+  </select> -->
 
   <!-- 특정 정규모임 조회 -->
-  <select id="selectMeetingById" parameterType="int" resultType="ReqularMeetingVO">
+  <!-- <select id="selectMeetingById" parameterType="int" resultType="ReqularMeetingVO">
     SELECT meeting_idx, name, description, leader_idx, created_at
     FROM regular_meetings
     WHERE meeting_idx = #{meetingId}
-  </select>
+  </select> -->
 </mapper>

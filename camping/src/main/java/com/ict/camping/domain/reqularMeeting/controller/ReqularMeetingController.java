@@ -37,7 +37,7 @@ public class ReqularMeetingController {
   // @Autowired
   // private PasswordEncoder passwordEncoder;
 
-  @PostMapping
+  @PostMapping("/api/regular-meetings")
   public ResponseEntity<String> createMeeting(@RequestBody ReqularMeetingVO meeting) {
     reqularMeetingService.createMeeting(meeting);
     return ResponseEntity.ok("Regular meeting created successfully!");

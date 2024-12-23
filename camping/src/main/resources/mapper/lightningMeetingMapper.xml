@@ -5,5 +5,5 @@
 <mapper namespace="com.ict.camping.domain.lightning-Metting.mapper.lightningMeetingMapper">
 
  
-  </select>
+
 </mapper>

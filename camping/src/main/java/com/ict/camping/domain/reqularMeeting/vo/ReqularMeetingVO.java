@@ -2,6 +2,8 @@ package com.ict.camping.domain.reqularMeeting.vo;
 
 import java.security.Timestamp;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,18 +12,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReqularMeetingVO {
-  private int meetingIdx;
-  private String name;
-  private String description;
-  private int leader_idx;
-  private Timestamp createdAt;
-  public void setRegion(String region) {
-    
-    throw new UnsupportedOperationException("Unimplemented method 'setRegion'");
+  private int meeting_idx;
+  private String name, description, profile_image, region, subregion;
+  private int leader_idx, personnel;
+  private Timestamp created_at;
+  // private MultipartFile file;
+  public String[] getHashtagsList() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getHashtagsList'");
   }
-  public void setCapacity(int capacity) {
-    
-    throw new UnsupportedOperationException("Unimplemented method 'setCapacity'");
-  }
+
+
 
 }

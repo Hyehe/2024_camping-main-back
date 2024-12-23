@@ -4,8 +4,34 @@
 
 <mapper namespace="com.ict.camping.domain.reqularMeeting.mapper.ReqularMeetingMapper">
 
-<!-- 정규 모임 목록 가져오기 -->
-  <select id="selectAllMeetings" resultMap="MeetingResultMap">
+  <!-- 1) 정규 모임 생성 -->
+  <insert id="insertMeeting" 
+          parameterType="com.ict.camping.domain.reqularMeeting.vo.ReqularMeetingVO"
+          useGeneratedKeys="true"
+          keyProperty="meeting_idx">
+    INSERT INTO regular_meetings 
+      (name, 
+       description, 
+       profile_image, 
+       region, 
+       subregion, 
+       personnel, 
+       leader_idx, 
+       created_at)
+    VALUES 
+      (#{name}, 
+       #{description}, 
+       #{profile_image}, 
+       #{region}, 
+       #{subregion}, 
+       #{personnel}, 
+       #{leader_idx}, 
+       NOW())
+  </insert>
+
+  <!-- 2) 전체 모임 목록 가져오기 -->
+  <!--  user_idx를 파라미터로 받아와서, 현재 사용자가 좋아요를 눌렀는지(left join) 체크 -->
+  <select id="selectAllMeetings" resultType="map">
     SELECT 
       rm.meeting_idx,
       rm.name,
@@ -14,45 +40,64 @@
       rm.region,
       rm.subregion,
       rm.personnel,
-      rm.created_at,
-      GROUP_CONCAT(h.name) AS hashtags, 
-      CASE WHEN f.user_idx IS NOT NULL THEN true ELSE false END AS favorites_idx
+      DATE_FORMAT(rm.created_at, '%Y-%m-%d') AS created_at,
+      /* 해시태그를 쉼표로 concat */
+      GROUP_CONCAT(DISTINCT h.name) AS hashtags,
+      /* 좋아요 여부 (존재하면 true, 없으면 false) */
+      CASE WHEN rmf.user_idx IS NOT NULL THEN TRUE ELSE FALSE END AS favorites_idx
     FROM regular_meetings rm
-    LEFT JOIN meeting_hashtags mh ON rm.meeting_idx = mh.meeting_idx
-    LEFT JOIN hashtags h ON mh.hashtag_idx = h.hashtag_idx
-    LEFT JOIN favorites f ON rm.meeting_idx = f.meeting_idx AND f.user_idx = #{user_idx}
+    LEFT JOIN meeting_hashtags mh 
+           ON rm.meeting_idx = mh.meeting_idx
+    LEFT JOIN hashtags h 
+           ON mh.hashtag_idx = h.hashtag_idx
+    LEFT JOIN regular_meetings_favorites rmf 
+           ON rm.meeting_idx = rmf.meeting_idx 
+          AND rmf.user_idx = #{user_idx}
     GROUP BY rm.meeting_idx
   </select>
 
-  <!-- 정규 모임 생성 -->
-  <insert id="createMeeting">
-    INSERT INTO regular_meetings (name, description, profile_image, region, subregion, personnel, leader_idx)
-    VALUES (#{name}, #{description}, #{profile_image}, #{region}, #{subregion}, #{personnel}, #{leader_idx})
+  <!-- 3) 특정 모임 조회 (단건) -->
+  <!--  resultType을 VO 혹은 map으로 할지 결정 -->
+  <select id="selectMeetingById" parameterType="int" resultType="com.ict.camping.domain.reqularMeeting.vo.ReqularMeetingVO">
+    SELECT 
+      rm.meeting_idx,
+      rm.name,
+      rm.description,
+      rm.profile_image,
+      rm.region,
+      rm.subregion,
+      rm.personnel,
+      rm.leader_idx,
+      rm.created_at
+    FROM regular_meetings rm
+    WHERE rm.meeting_idx = #{meetingId}
+  </select>
+
+  <!-- 4) 해시태그 존재 여부 조회 -->
+  <select id="findHashtagByName" parameterType="string" resultType="int">
+    SELECT hashtag_idx
+    FROM hashtags
+    WHERE name = #{hashtag}
+  </select>
+
+  <!-- 5) 해시태그 새로 삽입 -->
+  <insert id="insertHashtag" parameterType="string">
+    INSERT INTO hashtags (name)
+    VALUES (#{hashtag})
   </insert>
 
-  <!-- 해시태그 연결 -->
+  <!-- 6) 모임-해시태그 연결 삽입 -->
   <insert id="insertMeetingHashtags">
     INSERT INTO meeting_hashtags (meeting_idx, hashtag_idx)
     VALUES (#{meeting_idx}, #{hashtag_idx})
   </insert>
 
-  <!-- 정규모임 추가 -->
-  <!-- <insert id="insertMeeting" parameterType="ReqularMeetingVO">
-    INSERT INTO regular_meetings (name, description, leader_idx, created_at)
-    VALUES (#{name}, #{description}, #{leader_idx}, CURRENT_TIMESTAMP)
-  </insert> -->
-
-  <!-- 모든 정규모임 조회 -->
-  <!-- <select id="selectAllMeetings" resultType="ReqularMeetingVO">
-    SELECT meeting_idx, name, description, leader_idx, created_at
-    FROM regular_meetings
-    ORDER BY created_at DESC
+  <!-- 필요하다면 해시태그 목록만 가져오는 등의 쿼리를 추가 -->
+  <!-- 예) 해시태그 전부 가져오기 -->
+  <!-- <select id="selectAllHashtags" resultType="com.ict.camping.domain.reqularMeeting.vo.HashtagVO">
+    SELECT hashtag_idx, name 
+    FROM hashtags
+    ORDER BY hashtag_idx
   </select> -->
 
-  <!-- 특정 정규모임 조회 -->
-  <!-- <select id="selectMeetingById" parameterType="int" resultType="ReqularMeetingVO">
-    SELECT meeting_idx, name, description, leader_idx, created_at
-    FROM regular_meetings
-    WHERE meeting_idx = #{meetingId}
-  </select> -->
 </mapper>

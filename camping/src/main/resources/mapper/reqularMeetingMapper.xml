@@ -94,10 +94,28 @@
 
   <!-- 필요하다면 해시태그 목록만 가져오는 등의 쿼리를 추가 -->
   <!-- 예) 해시태그 전부 가져오기 -->
-  <!-- <select id="selectAllHashtags" resultType="com.ict.camping.domain.reqularMeeting.vo.HashtagVO">
+  <select id="selectAllHashtags" resultType="com.ict.camping.domain.reqularMeeting.vo.HashtagVO">
     SELECT hashtag_idx, name 
     FROM hashtags
     ORDER BY hashtag_idx
-  </select> -->
+  </select>
 
+   <!-- 좋아요 상태 확인 -->
+    <select id="checkFavorite" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM regular_meetings_favorites
+        WHERE user_idx = #{user_idx} AND meeting_idx = #{meeting_idx}
+    </select>
+
+    <!-- 좋아요 추가 -->
+    <insert id="insertFavorite">
+        INSERT INTO regular_meetings_favorites (user_idx, meeting_idx)
+        VALUES (#{user_idx}, #{meeting_idx})
+    </insert>
+
+    <!-- 좋아요 삭제 -->
+    <delete id="deleteFavorite">
+        DELETE FROM regular_meetings_favorites
+        WHERE user_idx = #{user_idx} AND meeting_idx = #{meeting_idx}
+    </delete>
 </mapper>

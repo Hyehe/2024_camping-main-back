@@ -16,4 +16,5 @@ public interface ReqularMeetingService {
   int findOrCreateHashtag(String hashtag);
   void insertMeetingHashtags(int meetingIdx, int hashtagIdx);
 
+  boolean toggleFavorite(int userIdx, int meetingIdx);
 }

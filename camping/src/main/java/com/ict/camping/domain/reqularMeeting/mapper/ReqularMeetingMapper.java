@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.ict.camping.domain.reqularMeeting.vo.HashtagVO;
 import com.ict.camping.domain.reqularMeeting.vo.ReqularMeetingVO;
 
 @Mapper
@@ -31,5 +32,14 @@ public interface ReqularMeetingMapper {
                                @Param("hashtag_idx") int hashtag_idx);
 
     // +) 해시태그 전체 목록 (필요시)
-    // List<HashtagVO> selectAllHashtags();
+     List<HashtagVO> selectAllHashtags();
+
+    // 좋아요 상태 확인
+    boolean checkFavorite(@Param("user_idx") int userIdx, @Param("meeting_idx") int meetingIdx);
+
+    // 좋아요 추가
+    void insertFavorite(@Param("user_idx") int userIdx, @Param("meeting_idx") int meetingIdx);
+
+    // 좋아요 삭제
+    void deleteFavorite(@Param("user_idx") int userIdx, @Param("meeting_idx") int meetingIdx);
 }

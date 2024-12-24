@@ -65,4 +65,20 @@ public class ReqularMeetingServiceImpl implements ReqularMeetingService {
     reqularMeetingMapper.insertMeetingHashtags(meetingIdx, hashtagIdx);
   }
 
+  @Override
+    public boolean toggleFavorite(int userIdx, int meetingIdx) {
+        // 좋아요 상태 확인
+        boolean isLiked = reqularMeetingMapper.checkFavorite(userIdx, meetingIdx);
+
+        if (isLiked) {
+            // 좋아요 상태라면 삭제
+            reqularMeetingMapper.deleteFavorite(userIdx, meetingIdx);
+            return false; // 좋아요 취소 상태
+        } else {
+            // 좋아요 상태가 아니라면 추가
+            reqularMeetingMapper.insertFavorite(userIdx, meetingIdx);
+            return true; // 좋아요 상태
+        }
+    }
+
 }

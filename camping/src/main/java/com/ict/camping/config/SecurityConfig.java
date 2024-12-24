@@ -17,14 +17,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // CSRF 보호 비활성화
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.GET, "/api/regular-meetings/**").permitAll() // GET 요청 허용
-                .requestMatchers("/ws/**", "/topic/**", "/app/**").permitAll() // WebSocket 관련 요청 허용
-                .anyRequest().authenticated() // 그 외 요청은 인증 필요
-            )
-            .httpBasic(); // HTTP 기본 인증 방식 사용
+                .csrf(csrf -> csrf.disable()) // CSRF 보호 비활성화
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/regular-meetings/**").permitAll()
+                        .requestMatchers("/ws/**", "/topic/**", "/app/**").permitAll()
+                        .anyRequest().authenticated())
+
+                .httpBasic(); // HTTP 기본 인증 방식 사용
 
         return http.build();
     }
@@ -36,7 +36,7 @@ public class SecurityConfig {
         configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
         configuration.addAllowedHeader("*"); // 모든 헤더 허용
         configuration.setAllowCredentials(true); // 인증 정보 포함 허용 (필요 시)
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
